@@ -1,0 +1,35 @@
+{% autoescape 'html' %}
+<div class="border rounded p-3 mb-3">
+  <img src="extension/whollycrypto/catalog/view/image/logo.svg" width="160" height="36" alt="Wholly Crypto" class="mb-2">
+  <p>{{ text_description }}</p>
+  <p id="wholly-error" class="text-danger" role="alert" hidden></p>
+  <button type="button" id="wholly-pay" class="btn btn-primary">{{ button_pay }}</button>
+</div>
+<script>
+(() => {
+  const button = document.getElementById('wholly-pay');
+  const error = document.getElementById('wholly-error');
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    error.hidden = true;
+    try {
+      const response = await fetch('{{ confirm_url|escape("js") }}'.replaceAll('&amp;', '&'), {
+        method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({wholly_token: '{{ wholly_token|escape("js") }}'})
+      });
+      const data = await response.json();
+      if (!response.ok || !data.redirect || data.error) throw new Error(data.error || '{{ text_retry|escape("js") }}');
+      window.location.assign(data.redirect);
+    } catch (failure) {
+      error.textContent = failure.message || '{{ text_retry|escape("js") }}';
+      error.hidden = false;
+    } finally {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+    }
+  });
+})();
+</script>
+{% endautoescape %}

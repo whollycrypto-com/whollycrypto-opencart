@@ -1,0 +1,38 @@
+{{ header }}{{ column_left }}
+{% autoescape 'html' %}
+<div id="content">
+  <div class="page-header"><div class="container-fluid">
+    <div class="float-end"><button type="submit" form="form-wholly" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save</button> <a class="btn btn-light" href="{{ back }}">Back</a></div>
+    <h1>Wholly Crypto</h1>
+  </div></div>
+  <div class="container-fluid">
+    <div class="card mb-3"><div class="card-header">Connect your installation</div><div class="card-body">
+      <p>Copy the API UUIDs from Project → Stores → Basic → API IDs. Use a project-restricted read/write API credential and the same store IPN signing secret. Never enter wallet keys.</p>
+      <form id="form-wholly" action="{{ save }}" method="post" data-oc-toggle="ajax">
+        {% for key, label in {'api_url':'API origin (https://api.example.com)', 'pay_url':'Checkout origin (https://pay.example.com)', 'project_id':'Project API UUID', 'store_id':'Store API UUID', 'api_key':'API credential', 'ipn_secret':'Store IPN signing secret'} %}
+          <div class="row mb-3"><label class="col-sm-3 col-form-label" for="wholly-{{ key }}">{{ label }}</label><div class="col-sm-9">
+            <input class="form-control" type="{{ key in ['api_key','ipn_secret'] ? 'password' : 'text' }}" id="wholly-{{ key }}" name="payment_whollycrypto_{{ key }}" value="{{ _context[key] }}" autocomplete="off">
+            {% if key in ['api_key','ipn_secret'] %}<div class="form-text">Leave blank to keep the saved value.</div>{% endif %}
+          </div></div>
+        {% endfor %}
+        <h2 class="h5 mt-4">Order statuses</h2>
+        <p>Only the paid status may be an OpenCart processing/complete status. Partial, unconfirmed or review payments never fulfill an order.</p>
+        {% for key,label in {'pending_status_id':'Awaiting payment','paid_status_id':'Verified payment','review_status_id':'Needs review','expired_status_id':'Expired, no payment'} %}
+          <div class="row mb-3"><label class="col-sm-3 col-form-label" for="wholly-{{ key }}">{{ label }}</label><div class="col-sm-9"><select class="form-select" id="wholly-{{ key }}" name="payment_whollycrypto_{{ key }}">
+            {% for status in order_statuses %}<option value="{{ status.order_status_id }}"{% if status.order_status_id == _context[key] %} selected{% endif %}>{{ status.name }}</option>{% endfor %}
+          </select></div></div>
+        {% endfor %}
+        <div class="row mb-3"><label class="col-sm-3 col-form-label" for="wholly-status">Accept new payments</label><div class="col-sm-9"><select class="form-select" name="payment_whollycrypto_status" id="wholly-status"><option value="0">Disabled</option><option value="1"{% if status %} selected{% endif %}>Enabled</option></select></div></div>
+        <div class="row mb-3"><label class="col-sm-3 col-form-label" for="wholly-email">Share customer email</label><div class="col-sm-9"><select class="form-select" name="payment_whollycrypto_share_email" id="wholly-email"><option value="0">No</option><option value="1"{% if share_email %} selected{% endif %}>Yes</option></select></div></div>
+        <div class="row mb-3"><label class="col-sm-3 col-form-label" for="wholly-sort">Sort order</label><div class="col-sm-9"><input class="form-control" type="number" min="0" max="999" id="wholly-sort" name="payment_whollycrypto_sort_order" value="{{ sort_order }}"></div></div>
+      </form>
+    </div></div>
+    <div class="card mb-3"><div class="card-header">Test and troubleshoot</div><div class="card-body">
+      <form action="{{ test }}" method="post" data-oc-toggle="ajax"><button type="submit" class="btn btn-outline-primary">Test saved connection</button></form>
+      <p class="mt-3">This tests API access, not a complete payment. If an order stays pending, open its invoice in Wholly Crypto and resend the signed IPN from delivery history. Do not mark it paid based on the browser return.</p>
+      <a href="https://github.com/whollycrypto-com/whollycrypto-opencart#readme" target="_blank" rel="noopener noreferrer">Installation and staging checklist</a>
+    </div></div>
+  </div>
+</div>
+{% endautoescape %}
+{{ footer }}
