@@ -54,9 +54,9 @@ checks are used; duplicate events cannot repeat the paid transition or stock upd
 | Invoice state | OpenCart handling |
 | --- | --- |
 | New / processing / partial / awaiting confirmations | Waiting |
-| Settled, paid or overpaid, no late/review flag | Configured paid status, subject to OpenCart fraud checks |
+| Settled, paid, no late/review flag | Configured paid status, subject to OpenCart fraud checks |
 | Expired or cancelled without funds | Configured expired status |
-| Late, invalid, changed amount or funds on an already cancelled order | Review, never automatically revive the order |
+| Overpaid, late, invalid, changed amount or funds on an already cancelled order | Review, never automatically revive the order |
 | Payment changes after fulfillment | Review note, no automatic reversal or refund |
 
 `payment.received` and `invoice.settled` can both contain `status: settled`. That is
